@@ -594,7 +594,7 @@ function orderError(l){
 }
 
 /* ================= Отрисовка ================= */
-function render(){ renderTabs(); renderHeader(); renderCalendar(); renderDay(); renderMonth(); renderCta(); }
+function render(){ renderTabs(); renderHeader(); renderCalendar(); renderDay(); renderMonth(); renderCta(); schedulePersist(); }
 
 function renderTabs(){
   $('tabLayouts').innerHTML=svg('layers')+'Макеты';
@@ -1188,7 +1188,7 @@ function addType(){
   var used=types.map(function(t){ return t.color; });
   var color=PALETTE.find(function(c){ return used.indexOf(c)<0; })||PALETTE[types.length%PALETTE.length];
   types.push({id:uid('t'),name:name,color:color});
-  haptic.note('success'); renderTypes(); refreshTypeUI(); toast('Тип «'+name+'» добавлен');
+  haptic.note('success'); renderTypes(); refreshTypeUI(); schedulePersist(); toast('Тип «'+name+'» добавлен');
   setTimeout(function(){ try{ $('newType').focus(); }catch(e){} },30);
 }
 function renameType(inp){
@@ -1197,12 +1197,12 @@ function renameType(inp){
   if(!name){ inp.value=t.name; toast('Название не может быть пустым',true); return; }
   if(name===t.name) return;
   if(nameTaken(name,t.id)){ inp.value=t.name; toast('Такой тип уже есть',true); return; }
-  t.name=name; refreshTypeUI(); toast('Переименовано');
+  t.name=name; refreshTypeUI(); schedulePersist(); toast('Переименовано');
 }
 function deleteType(id){
   types=types.filter(function(t){ return t.id!==id; });
   layouts.forEach(function(l){ if(l.type===id) l.type='other'; });
-  typesUI.pending=null; haptic.note('warning'); renderTypes(); refreshTypeUI(); toast('Тип удалён');
+  typesUI.pending=null; haptic.note('warning'); renderTypes(); refreshTypeUI(); schedulePersist(); toast('Тип удалён');
 }
 
 /* ================= Фон ================= */
@@ -1288,6 +1288,78 @@ function processPhoto(file){
   img.src=url;
 }
 
+/* ================= Сохранение данных (личное: Telegram CloudStorage + память браузера) ================= */
+var dataReady=false, persistTimer=null, lastSavedJSON='', CS_CHUNK=3500, CS_PREFIX='md_';
+function snapshot(){ return {v:1, ts:Date.now(), types:types, layouts:layouts, invoices:invoices}; }
+function validSaved(o){ return o && o.v===1 && Array.isArray(o.layouts) && Array.isArray(o.types) && o.invoices && typeof o.invoices==='object'; }
+function applySaved(o){ types=o.types; layouts=o.layouts; invoices=o.invoices; }
+function cloudOK(){ return tgv('6.9') && tg && tg.CloudStorage; }
+function schedulePersist(){
+  if(!dataReady) return;
+  clearTimeout(persistTimer); persistTimer=setTimeout(persistNow,600);
+}
+function persistNow(){
+  if(!dataReady) return;
+  clearTimeout(persistTimer);
+  var snap=snapshot(), body=JSON.stringify({types:snap.types,layouts:snap.layouts,invoices:snap.invoices});
+  if(body===lastSavedJSON) return;
+  lastSavedJSON=body;
+  var json=JSON.stringify(snap);
+  lsSet('appData',json);
+  if(!cloudOK()) return;
+  try{
+    var parts=[]; for(var i=0;i<json.length;i+=CS_CHUNK) parts.push(json.slice(i,i+CS_CHUNK));
+    if(parts.length>900) return;
+    var left=parts.length, failed=false;
+    parts.forEach(function(part,i){
+      tg.CloudStorage.setItem(CS_PREFIX+i,part,function(err){
+        if(err) failed=true;
+        if(--left===0 && !failed) tg.CloudStorage.setItem(CS_PREFIX+'meta',JSON.stringify({n:parts.length,ts:snap.ts}));
+      });
+    });
+  }catch(e){}
+}
+function loadLocalSaved(){
+  try{ var o=JSON.parse(lsGet('appData')||'null'); return validSaved(o)?o:null; }catch(e){ return null; }
+}
+function loadCloudSaved(cb){
+  if(!cloudOK()) return cb(null);
+  var done=false; var t=setTimeout(function(){ if(!done){ done=true; cb(null); } },4000);
+  function fin(v){ if(done) return; done=true; clearTimeout(t); cb(v); }
+  try{
+    tg.CloudStorage.getItem(CS_PREFIX+'meta',function(err,m){
+      if(err||!m) return fin(null);
+      var meta; try{ meta=JSON.parse(m); }catch(e){ return fin(null); }
+      if(!meta || !(meta.n>0)) return fin(null);
+      var keys=[]; for(var i=0;i<meta.n;i++) keys.push(CS_PREFIX+i);
+      tg.CloudStorage.getItems(keys,function(err2,vals){
+        if(err2||!vals) return fin(null);
+        var json=''; for(var i=0;i<keys.length;i++){ if(typeof vals[keys[i]]!=='string') return fin(null); json+=vals[keys[i]]; }
+        try{ var o=JSON.parse(json); fin(validSaved(o)?o:null); }catch(e){ fin(null); }
+      });
+    });
+  }catch(e){ fin(null); }
+}
+function startWithSaved(fallbackOk){
+  dataReady=false; clearTimeout(persistTimer);
+  var local=loadLocalSaved();
+  if(local) applySaved(local);
+  if(!local && !fallbackOk) return false;
+  lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices});
+  $('state').hidden=true; $('content').hidden=false; $('cta').hidden=false;
+  render();
+  loadCloudSaved(function(cloud){
+    if(cloud && (!local || cloud.ts>local.ts)){
+      applySaved(cloud); lsSet('appData',JSON.stringify(cloud));
+      lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices});
+      dataReady=true; render();
+    } else { dataReady=true; schedulePersist(); }
+  });
+  return true;
+}
+document.addEventListener('visibilitychange',function(){ if(document.hidden) persistNow(); });
+window.addEventListener('pagehide',persistNow);
+
 /* ================= Загрузка данных ================= */
 function showState(kind){
   $('content').hidden=true; $('cta').hidden=true; $('headPill').hidden=true;
@@ -1327,10 +1399,9 @@ function load(){
           if(/^\d{4}-\d{2}$/.test(k) && v && Number(v.amount)>0) invoices[k]={amount:Number(v.amount),note:String(v.note||'')};
         });
       }
-      $('state').hidden=true; $('content').hidden=false; $('cta').hidden=false;
-      render();
+      startWithSaved(true);
     })
-    .catch(function(e){ clearTimeout(timer); console.error(e); showState('error'); });
+    .catch(function(e){ clearTimeout(timer); console.error(e); if(!startWithSaved(false)) showState('error'); });
 }
 
 /* ================= События ================= */
