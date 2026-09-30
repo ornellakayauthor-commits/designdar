@@ -113,6 +113,13 @@ h1{margin:0;font-size:30px;line-height:1.05;font-weight:600;letter-spacing:-.025
 .nseg-b svg{width:17px;height:17px;flex-shrink:0}
 .nseg-b b{min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:inline-grid;place-items:center;font-size:11.5px;font-weight:700;background:rgba(255,255,255,.7);color:var(--muted)}
 @media (max-width:360px){.nseg-b{font-size:13px;gap:5px;padding:6px 5px}.nseg-b svg{width:15px;height:15px}.nseg-b b{min-width:18px;height:18px;padding:0 5px}}
+.done-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 4px 10px}
+.done-head span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.done-clear{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.85);border:1px solid rgba(194,78,104,.25);color:var(--danger);font-size:13px;font-weight:600;transition:transform .15s}
+.done-clear:active{transform:scale(.95)}
+.done-clear svg{width:15px;height:15px}
+.all-done{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border-radius:var(--r-md);font-size:14px;font-weight:600;color:var(--ready-ink)}
+.all-done svg{width:18px;height:18px}
 .nseg-b.on{background:var(--nb);color:var(--ni);box-shadow:0 0 0 1.5px var(--ni),0 6px 16px -10px rgba(var(--gl),.6)}
 .nseg-b.on b{background:var(--ni);color:#fff}
 .empty.k-rule .empty-ic,.empty.k-task .empty-ic{color:var(--ni);background:var(--nb)}
@@ -982,10 +989,32 @@ function renderNotes(){
   if(!list.length){
     html+='<div class="empty glass k-'+k.id+'"><div class="empty-ic">'+svg(k.icon)+'</div><p class="empty-t">'+k.emptyT+'</p>'+
       '<p class="empty-s">'+k.emptyS+'</p></div>';
+  } else if(noteFilter==='task'){
+    var active=list.filter(function(n){ return !n.done; }), done=list.filter(function(n){ return n.done; });
+    html+= active.length ? '<div class="list">'+active.map(noteCardHTML).join('')+'</div>'
+      : '<div class="all-done glass">'+svg('tick',2.4)+'Все задания выполнены</div>';
+    if(done.length){
+      html+='<div class="done-head"><span>Выполненные · '+done.length+'</span>'+
+        '<button class="done-clear" data-act="done-clear">'+svg('trash')+'Удалить все</button></div>'+
+        '<div class="list">'+done.map(noteCardHTML).join('')+'</div>';
+    }
   } else {
     html+='<div class="list">'+list.map(noteCardHTML).join('')+'</div>';
   }
   sec.innerHTML=html;
+}
+function confirmDoneClear(){
+  var n=notes.filter(function(x){ return x.kind==='task' && x.done; }).length; if(!n) return;
+  haptic.impact('medium');
+  openSheet(head('Удалить выполненные?')+
+    '<p class="confirm-text">'+n+' '+plural(n,['выполненное задание','выполненных задания','выполненных заданий'])+' исчезнут навсегда. Невыполненные задания и правила останутся. Восстановить удалённое будет нельзя.</p>'+
+    '<div class="btn-row"><button class="btn ghost" data-act="close">Отмена</button><button class="btn danger" data-act="done-clear-yes">Удалить '+n+'</button></div>');
+}
+function doDoneClear(){
+  var n=notes.filter(function(x){ return x.kind==='task' && x.done; }).length;
+  notes=notes.filter(function(x){ return !(x.kind==='task' && x.done); });
+  closeSheet(); haptic.note('warning'); render();
+  toast('Удалено: '+n);
 }
 function setNoteTab(f){
   if(!NOTE_KINDS.some(function(k){ return k.id===f; })) return;
@@ -1845,6 +1874,8 @@ function onAct(e){
   switch(d.act){
     case 'close': closeSheet(); break;
     case 'nfilter': setNoteTab(d.f); break;
+    case 'done-clear': confirmDoneClear(); break;
+    case 'done-clear-yes': doDoneClear(); break;
     case 'note': haptic.impact('light'); noteFrom=null; openNote(d.id); break;
     case 'note-done': e.stopPropagation(); toggleNoteDone(d.id); break;
     case 'note-edit': openNoteEdit(noteState&&noteState.id); break;
