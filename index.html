@@ -604,6 +604,26 @@ select.input{padding-right:44px;text-overflow:ellipsis;background-image:var(--ch
 (function(){
 'use strict';
 
+/* ================= Автообновление: если на сервере новая версия — перезагружаемся ================= */
+var APP_VERSION='2026-10-01.2';
+function checkForUpdate(){
+  try{
+    fetch(location.pathname+'?_check='+Date.now(),{cache:'no-store'})
+      .then(function(r){ return r.ok ? r.text() : ''; })
+      .then(function(t){
+        var m=t.match(/var APP_VERSION='([^']+)'/);
+        if(!m || m[1]===APP_VERSION) return;
+        var tried=null; try{ tried=sessionStorage.getItem('updTried'); }catch(e){}
+        if(tried===m[1]) return;
+        try{ sessionStorage.setItem('updTried',m[1]); }catch(e){}
+        if(document.getElementById('sheet') && document.getElementById('sheet').classList.contains('open')) return;
+        try{ if(typeof persistNow==='function') persistNow(); }catch(e){}
+        var u=new URL(location.href); u.searchParams.set('v',m[1]);
+        setTimeout(function(){ location.replace(u.toString()); },150);
+      }).catch(function(){});
+  }catch(e){}
+}
+
 /* ================= Telegram ================= */
 var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 function tgv(v){ try{ return !!(tg && tg.isVersionAtLeast && tg.isVersionAtLeast(v)); }catch(e){ return false; } }
@@ -2007,6 +2027,7 @@ try{ if(tgv('6.1')) tg.BackButton.onClick(goBack); }catch(e){}
 $('state').addEventListener('click',function(e){ if(e.target.closest('[data-retry]')) load(); });
 
 loadBg();
+setTimeout(checkForUpdate,300);
 load();
 })();
 </script>
