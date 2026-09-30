@@ -108,10 +108,14 @@ h1{margin:0;font-size:30px;line-height:1.05;font-weight:600;letter-spacing:-.025
 .s-empty{padding:26px 10px;text-align:center;font-size:14px;line-height:1.5;color:var(--muted)}
 /* ---------- Правила и заметки ---------- */
 .notes-sec{margin-top:6px}
-.nfilters{display:flex;gap:6px;overflow-x:auto;margin:0 -4px 14px;padding:2px 4px;scrollbar-width:none}
-.nfilters::-webkit-scrollbar{display:none}
-.nfilters .tchip{flex-shrink:0}
-.nfilters .tchip b{font-weight:600;color:var(--muted);margin-left:2px}
+.nseg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:19px;margin:0 0 18px;position:sticky;top:max(8px,env(safe-area-inset-top));z-index:5}
+.nseg-b{min-height:48px;padding:6px 8px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:14px;font-weight:600;line-height:1.15;color:var(--ink-soft);text-align:center;transition:background .2s,color .2s,box-shadow .2s}
+.nseg-b svg{width:17px;height:17px;flex-shrink:0}
+.nseg-b b{min-width:20px;height:20px;padding:0 6px;border-radius:10px;display:inline-grid;place-items:center;font-size:11.5px;font-weight:700;background:rgba(255,255,255,.7);color:var(--muted)}
+@media (max-width:360px){.nseg-b{font-size:13px;gap:5px;padding:6px 5px}.nseg-b svg{width:15px;height:15px}.nseg-b b{min-width:18px;height:18px;padding:0 5px}}
+.nseg-b.on{background:var(--nb);color:var(--ni);box-shadow:0 0 0 1.5px var(--ni),0 6px 16px -10px rgba(var(--gl),.6)}
+.nseg-b.on b{background:var(--ni);color:#fff}
+.empty.k-rule .empty-ic,.empty.k-task .empty-ic{color:var(--ni);background:var(--nb)}
 .note{display:flex;gap:12px;width:100%;text-align:left;padding:14px;border-radius:var(--r-md);cursor:pointer;transition:transform .15s;-webkit-tap-highlight-color:transparent}
 .note:active{transform:scale(.985)}
 .note.done .note-title,.note.done .note-text{color:var(--muted)}
@@ -685,7 +689,7 @@ function toast(msg,isErr){
 
 /* ================= Состояние ================= */
 var types=[], layouts=[], invoices={}, notes=[];
-var noteFilter='all', noteState=null, noteFrom=null;
+var noteFilter=(function(){ try{ var v=localStorage.getItem('noteTab'); return v==='task'?'task':'rule'; }catch(e){ return 'rule'; } })(), noteState=null, noteFrom=null;
 var tab='layouts';
 var now=new Date();
 var viewY=now.getFullYear(), viewM=now.getMonth();
@@ -925,15 +929,17 @@ function renderMonth(){
 }
 
 function renderCta(){
-  $('ctaText').textContent = tab==='layouts' ? 'Отметить' : (tab==='rules' ? 'Новая заметка' : 'Посчитать');
+  $('ctaText').textContent = tab==='layouts' ? 'Отметить' : (tab==='rules' ? kindOf(noteFilter).add : 'Посчитать');
   $('ctaIc').innerHTML = svg('plus',2.4);
   $('ctaDate').textContent = tab==='rules' ? '' : '· '+dateTiny(selected);
 }
 
 /* ================= Правила и заметки ================= */
 var NOTE_KINDS=[
-  {id:'rule',  label:'Правило', many:'Правила', icon:'rule', hint:'Правило'},
-  {id:'task',  label:'Задание', many:'Задания', icon:'flag', hint:'Задание руководителя'}
+  {id:'rule', label:'Правило', many:'Правила', tab:'Правила', title:'Правила', icon:'rule', hint:'Правило', add:'Новое правило',
+   emptyT:'Правил пока нет', emptyS:'Записывай правила для макетов и требования типографии.<br>Нажми «Новое правило».'},
+  {id:'task', label:'Задание', many:'Задания', tab:'Задания руководителя', title:'Задания руководителя', icon:'flag', hint:'Задание руководителя', add:'Новое задание',
+   emptyT:'Заданий пока нет', emptyS:'Записывай задания руководителя и отмечай выполненные.<br>Нажми «Новое задание».'}
 ];
 function kindOf(id){ return NOTE_KINDS.find(function(k){ return k.id===id; })||NOTE_KINDS[0]; }
 function findN(id){ return notes.find(function(n){ return n.id===id; }); }
@@ -964,20 +970,28 @@ function noteCardHTML(n){
 }
 function renderNotes(){
   var sec=$('notesSec');
-  var counts={all:notes.length}; NOTE_KINDS.forEach(function(k){ counts[k.id]=notes.filter(function(n){ return n.kind===k.id; }).length; });
-  if(noteFilter!=='all' && !counts[noteFilter]) noteFilter='all';
-  var chips='<div class="nfilters">'+[{id:'all',many:'Все'}].concat(NOTE_KINDS).map(function(k){
-    return '<button class="tchip'+(noteFilter===k.id?' on':'')+'" data-act="nfilter" data-f="'+k.id+'">'+k.many+(counts[k.id]?' <b>'+counts[k.id]+'</b>':'')+'</button>';
+  if(!NOTE_KINDS.some(function(k){ return k.id===noteFilter; })) noteFilter='rule';
+  var counts={}; NOTE_KINDS.forEach(function(k){ counts[k.id]=notes.filter(function(n){ return n.kind===k.id; }).length; });
+  var k=kindOf(noteFilter);
+  var seg='<div class="nseg glass" role="tablist">'+NOTE_KINDS.map(function(x){
+    var on=noteFilter===x.id;
+    return '<button class="nseg-b k-'+x.id+(on?' on':'')+'" role="tab" aria-selected="'+on+'" data-act="nfilter" data-f="'+x.id+'">'+svg(x.icon)+'<span>'+x.tab+'</span>'+(counts[x.id]?'<b>'+counts[x.id]+'</b>':'')+'</button>';
   }).join('')+'</div>';
-  var list=sortedNotes(notes.filter(function(n){ return noteFilter==='all' || n.kind===noteFilter; }));
-  var html='<div class="sec-head"><h2>Правила и заметки</h2></div>'+(notes.length?chips:'');
+  var list=sortedNotes(notes.filter(function(n){ return n.kind===noteFilter; }));
+  var html=seg+'<div class="sec-head"><h2>'+k.title+'</h2></div>';
   if(!list.length){
-    html+='<div class="empty glass"><div class="empty-ic">'+svg('note')+'</div><p class="empty-t">Здесь пока пусто</p>'+
-      '<p class="empty-s">Записывай правила — для макетов и от типографии — и задания руководителя.<br>Нажми «Новая заметка».</p></div>';
+    html+='<div class="empty glass k-'+k.id+'"><div class="empty-ic">'+svg(k.icon)+'</div><p class="empty-t">'+k.emptyT+'</p>'+
+      '<p class="empty-s">'+k.emptyS+'</p></div>';
   } else {
     html+='<div class="list">'+list.map(noteCardHTML).join('')+'</div>';
   }
   sec.innerHTML=html;
+}
+function setNoteTab(f){
+  if(!NOTE_KINDS.some(function(k){ return k.id===f; })) return;
+  if(f!==noteFilter){ haptic.tap(); noteFilter=f; lsSet('noteTab',f); renderNotes(); renderCta(); }
+  var sec=$('notesSec'), top=sec.getBoundingClientRect().top;
+  if(top<0 || top>innerHeight*0.6){ try{ window.scrollTo({top:Math.max(0,window.scrollY+top-12),behavior:'smooth'}); }catch(e){ window.scrollTo(0,Math.max(0,window.scrollY+top-12)); } }
 }
 function openNote(id){
   var n=findN(id); if(!n) return;
@@ -1008,7 +1022,7 @@ function noteLayoutOptions(cur){
 }
 function openNoteEdit(id,preset){
   var n=id?findN(id):null; preset=preset||{};
-  noteState={id:n?n.id:null, kind:n?n.kind:(preset.kind||(noteFilter!=='all'?noteFilter:'rule'))};
+  noteState={id:n?n.id:null, kind:n?n.kind:(preset.kind||noteFilter)};
   var layoutId=n?(n.layoutId||''):(preset.layoutId||'');
   openSheet(
     head(n?'Изменить заметку':'Новая заметка', n?'note-cancel':'close')+
@@ -1029,6 +1043,7 @@ function saveNote(){
   var lid=$('nLayout').value||'', now=Date.now(), n=noteState.id?findN(noteState.id):null;
   if(n){ n.title=title; n.text=text; n.kind=noteState.kind; n.layoutId=lid; n.updated=now; if(n.kind!=='task') n.done=false; }
   else { n={id:uid('n'),kind:noteState.kind,title:title,text:text,layoutId:lid,done:false,created:now,updated:now}; notes.push(n); }
+  if(noteFilter!==n.kind){ noteFilter=n.kind; lsSet('noteTab',noteFilter); }
   haptic.note('success'); render();
   if(noteFrom && findL(noteFrom)){ openLayout(noteFrom); noteFrom=null; } else openNote(n.id);
   toast('Сохранено');
@@ -1829,7 +1844,7 @@ function onAct(e){
   var d=a.dataset;
   switch(d.act){
     case 'close': closeSheet(); break;
-    case 'nfilter': haptic.tap(); noteFilter=d.f; renderNotes(); break;
+    case 'nfilter': setNoteTab(d.f); break;
     case 'note': haptic.impact('light'); noteFrom=null; openNote(d.id); break;
     case 'note-done': e.stopPropagation(); toggleNoteDone(d.id); break;
     case 'note-edit': openNoteEdit(noteState&&noteState.id); break;
