@@ -106,13 +106,58 @@ h1{margin:0;font-size:30px;line-height:1.05;font-weight:600;letter-spacing:-.025
 .sres-s{margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
 .sres-s i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .s-empty{padding:26px 10px;text-align:center;font-size:14px;line-height:1.5;color:var(--muted)}
+/* ---------- Правила и заметки ---------- */
+.notes-sec{margin-top:6px}
+.nfilters{display:flex;gap:6px;overflow-x:auto;margin:0 -4px 14px;padding:2px 4px;scrollbar-width:none}
+.nfilters::-webkit-scrollbar{display:none}
+.nfilters .tchip{flex-shrink:0}
+.nfilters .tchip b{font-weight:600;color:var(--muted);margin-left:2px}
+.note{display:flex;gap:12px;width:100%;text-align:left;padding:14px;border-radius:var(--r-md);cursor:pointer;transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.note:active{transform:scale(.985)}
+.note.done .note-title,.note.done .note-text{color:var(--muted)}
+.note.done .note-title{text-decoration:line-through;text-decoration-color:rgba(0,0,0,.25)}
+.n-ic{flex-shrink:0;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--nb);color:var(--ni);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.n-ic svg{width:20px;height:20px}
+button.n-ic{transition:transform .15s}
+button.n-ic:active{transform:scale(.9)}
+.n-ic.chk{background:rgba(255,255,255,.9);border:2px solid var(--ni);color:transparent}
+.note.done .n-ic.chk{background:var(--ni);border-color:var(--ni);color:#fff}
+.k-rule{--nb:var(--req-bg);--ni:var(--req-ink)}
+.k-print{--nb:var(--sent-bg);--ni:var(--sent-ink)}
+.k-task{--nb:var(--ready-bg);--ni:var(--ready-ink)}
+.note-body{flex:1;min-width:0}
+.note-top{display:flex;align-items:center;gap:8px}
+.note-kind{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ni)}
+.note-pin{margin-left:auto;color:var(--pink-deep);display:inline-flex}
+.note-pin svg{width:14px;height:14px}
+.note-title{margin-top:3px;font-size:15.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.note-text{margin-top:4px;font-size:13.5px;line-height:1.45;color:var(--ink-soft);white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.note-meta{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12px;color:var(--muted)}
+.note-link{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.85);border:1px solid var(--stroke);color:var(--ink-soft);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-link svg{width:12px;height:12px;flex-shrink:0}
+.note-full{margin:14px 0 12px;padding:16px;border-radius:var(--r-md);background:rgba(255,255,255,.8);border:1px solid var(--stroke);font-size:15px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
+.chip-row .type-chip svg{width:13px;height:13px;flex-shrink:0;color:var(--pink-deep)}
+button.type-chip{max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.note-when{margin:-4px 2px 14px;font-size:12.5px;color:var(--muted)}
+.kind-chips .tchip i{width:9px;height:9px}
+.btn.done-btn{width:100%;flex:none;margin-bottom:10px}
+.lnotes{margin:0 0 12px;border-radius:var(--r-md);padding:12px 14px;background:rgba(255,255,255,.8);border:1px solid var(--stroke)}
+.lnotes-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.lnotes-h .label{margin:0}
+.lnote{display:flex;align-items:flex-start;gap:9px;width:100%;text-align:left;padding:9px 0;border-top:1px solid rgba(var(--pk),.18);font-size:14px;line-height:1.4;color:var(--ink)}
+.lnote:first-of-type{border-top:0}
+.lnote i{flex-shrink:0;width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--ni)}
+.lnote span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.lnote.done span{color:var(--muted);text-decoration:line-through}
+.lnotes-empty{font-size:13px;color:var(--muted);padding:2px 0 4px}
 .s-back{display:inline-flex;align-items:center;gap:4px;margin:-4px 0 10px;font-size:13px;font-weight:600;color:var(--pink-deep)}
 .s-back svg{width:16px;height:16px}
 .pill{flex-shrink:0;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
 
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:19px;margin:0 0 14px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:19px;margin:0 0 14px}
 .tab{height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14.5px;font-weight:600;color:var(--ink-soft);transition:background .2s,color .2s,box-shadow .2s}
-.tab svg{width:18px;height:18px}
+.tab svg{width:18px;height:18px;flex-shrink:0}
+@media (max-width:360px){.tab{font-size:13.5px;gap:6px}.tab svg{width:16px;height:16px}}
 .tab.on{background:#fff;color:var(--pink-deep);box-shadow:0 6px 16px -10px rgba(var(--gl),.6)}
 
 /* ---------- календарь ---------- */
@@ -498,10 +543,11 @@ select.input{padding-right:44px;text-overflow:ellipsis;background-image:var(--ch
   <div id="content" hidden>
     <nav class="tabs glass" role="tablist">
       <button class="tab on" role="tab" data-tab="layouts" id="tabLayouts" aria-selected="true"></button>
+      <button class="tab" role="tab" data-tab="rules" id="tabRules" aria-selected="false"></button>
       <button class="tab" role="tab" data-tab="orders" id="tabOrders" aria-selected="false"></button>
     </nav>
 
-    <section class="calendar glass">
+    <section class="calendar glass" id="calSec">
       <div class="cal-head">
         <button class="nav" id="prevBtn" aria-label="Предыдущий месяц"></button>
         <div class="cal-title">
@@ -531,6 +577,7 @@ select.input{padding-right:44px;text-overflow:ellipsis;background-image:var(--ch
     </section>
 
     <section class="month-sec" id="monthSec" hidden></section>
+    <section class="notes-sec" id="notesSec" hidden></section>
   </div>
 </main>
 
@@ -605,6 +652,10 @@ var ICON = {
   down:'<path d="M6 9l6 6 6-6"/>',
   sort:'<path d="M8 4v16M4.5 7.5L8 4l3.5 3.5M16 20V4M12.5 16.5L16 20l3.5-3.5"/>',
   grip:'<circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/>',
+  rule:'<path d="M6 4.5h9.5L19 8v11.5H6z"/><path d="M15 4.5V8.5h4"/><path d="M9 12h7M9 15.5h5"/>',
+  printer:'<path d="M7 9V4h10v5"/><rect x="3.5" y="9" width="17" height="8" rx="2.5"/><path d="M7 14h10v6H7z"/>',
+  flag:'<path d="M5.5 21V4"/><path d="M5.5 4.5h11l-2 4 2 4h-11"/>',
+  note:'<path d="M5 4.5h14v10l-5 5H5z"/><path d="M14 19.5v-5h5"/>',
   open:'<path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>'
 };
 function svg(name, sw){
@@ -637,7 +688,8 @@ function toast(msg,isErr){
 }
 
 /* ================= Состояние ================= */
-var types=[], layouts=[], invoices={};
+var types=[], layouts=[], invoices={}, notes=[];
+var noteFilter='all', noteState=null, noteFrom=null;
 var tab='layouts';
 var now=new Date();
 var viewY=now.getFullYear(), viewM=now.getMonth();
@@ -660,12 +712,20 @@ function orderError(l){
 }
 
 /* ================= Отрисовка ================= */
-function render(){ renderTabs(); renderHeader(); renderCalendar(); renderDay(); renderMonth(); renderCta(); schedulePersist(); }
+function render(){
+  renderTabs(); renderHeader();
+  var rules=tab==='rules';
+  $('calSec').hidden=rules; $('daySection').hidden=rules; $('notesSec').hidden=!rules;
+  if(rules){ renderNotes(); $('monthSec').hidden=true; $('monthSec').innerHTML=''; }
+  else { $('notesSec').innerHTML=''; renderCalendar(); renderDay(); renderMonth(); }
+  renderCta(); schedulePersist();
+}
 
 function renderTabs(){
   $('tabLayouts').innerHTML=svg('layers')+'Макеты';
+  $('tabRules').innerHTML=svg('rule')+'Правила';
   $('tabOrders').innerHTML=svg('calc')+'Учёт';
-  [['tabLayouts','layouts'],['tabOrders','orders']].forEach(function(p){
+  [['tabLayouts','layouts'],['tabRules','rules'],['tabOrders','orders']].forEach(function(p){
     var on=tab===p[1]; $(p[0]).classList.toggle('on',on); $(p[0]).setAttribute('aria-selected',on);
   });
   $('legend').innerHTML = tab==='layouts'
@@ -686,7 +746,10 @@ function monthStats(y,m){
 
 function renderHeader(){
   var el=$('headPill');
-  if(tab==='layouts'){
+  if(tab==='rules'){
+    var open=notes.filter(function(n){ return n.kind==='task' && !n.done; }).length;
+    el.textContent = open ? open+' в работе' : notes.length+' '+plural(notes.length,['заметка','заметки','заметок']);
+  } else if(tab==='layouts'){
     var active=layouts.filter(function(l){ return statusOf(l) && !l.ready; }).length;
     el.textContent = active ? active+' в работе' : 'Всё готово';
   } else {
@@ -866,9 +929,161 @@ function renderMonth(){
 }
 
 function renderCta(){
-  $('ctaText').textContent = tab==='layouts' ? 'Отметить' : 'Посчитать';
+  $('ctaText').textContent = tab==='layouts' ? 'Отметить' : (tab==='rules' ? 'Новая заметка' : 'Посчитать');
   $('ctaIc').innerHTML = svg('plus',2.4);
-  $('ctaDate').textContent='· '+dateTiny(selected);
+  $('ctaDate').textContent = tab==='rules' ? '' : '· '+dateTiny(selected);
+}
+
+/* ================= Правила и заметки ================= */
+var NOTE_KINDS=[
+  {id:'rule',  label:'Правило',    many:'Правила',    icon:'rule',    hint:'Правило для макета'},
+  {id:'print', label:'Типография', many:'Типография', icon:'printer', hint:'Примечание типографии'},
+  {id:'task',  label:'Задание',    many:'Задания',    icon:'flag',    hint:'Задание руководителя'}
+];
+function kindOf(id){ return NOTE_KINDS.find(function(k){ return k.id===id; })||NOTE_KINDS[0]; }
+function findN(id){ return notes.find(function(n){ return n.id===id; }); }
+function sortedNotes(list){
+  return list.slice().sort(function(a,b){
+    if(!!a.pinned!==!!b.pinned) return a.pinned?-1:1;
+    var ad=a.kind==='task'&&a.done, bd=b.kind==='task'&&b.done;
+    if(ad!==bd) return ad?1:-1;
+    return (b.updated||0)-(a.updated||0);
+  });
+}
+function noteWhen(ts){
+  if(!ts) return '';
+  var d=new Date(ts), k=keyOf(d), tk=todayKey();
+  if(k===tk) return 'сегодня';
+  var y=new Date(); y.setDate(y.getDate()-1);
+  if(k===keyOf(y)) return 'вчера';
+  return dateShort(k)+(d.getFullYear()!==new Date().getFullYear()?' '+d.getFullYear():'');
+}
+function noteCardHTML(n){
+  var k=kindOf(n.kind), l=n.layoutId?findL(n.layoutId):null, task=n.kind==='task';
+  var ic = task
+    ? '<button class="n-ic chk" data-act="note-done" data-id="'+esc(n.id)+'" aria-label="'+(n.done?'Вернуть в работу':'Отметить выполненным')+'">'+svg('tick',2.6)+'</button>'
+    : '<span class="n-ic">'+svg(k.icon)+'</span>';
+  return '<div class="note glass k-'+k.id+(task&&n.done?' done':'')+'" role="button" tabindex="0" data-act="note" data-id="'+esc(n.id)+'">'+ic+
+    '<div class="note-body"><div class="note-top"><span class="note-kind">'+k.label+(task&&n.done?' · выполнено':'')+'</span>'+(n.pinned?'<span class="note-pin">'+svg('pin',2)+'</span>':'')+'</div>'+
+    (n.title?'<div class="note-title">'+esc(n.title)+'</div>':'')+
+    (n.text?'<div class="note-text">'+esc(n.text)+'</div>':'')+
+    '<div class="note-meta">'+(l?'<span class="note-link">'+svg('layers',2)+esc(l.title)+'</span>':'')+'<span>'+noteWhen(n.updated)+'</span></div>'+
+    '</div></div>';
+}
+function renderNotes(){
+  var sec=$('notesSec');
+  var counts={all:notes.length}; NOTE_KINDS.forEach(function(k){ counts[k.id]=notes.filter(function(n){ return n.kind===k.id; }).length; });
+  if(noteFilter!=='all' && !counts[noteFilter]) noteFilter='all';
+  var chips='<div class="nfilters">'+[{id:'all',many:'Все'}].concat(NOTE_KINDS).map(function(k){
+    return '<button class="tchip'+(noteFilter===k.id?' on':'')+'" data-act="nfilter" data-f="'+k.id+'">'+k.many+(counts[k.id]?' <b>'+counts[k.id]+'</b>':'')+'</button>';
+  }).join('')+'</div>';
+  var list=sortedNotes(notes.filter(function(n){ return noteFilter==='all' || n.kind===noteFilter; }));
+  var html='<div class="sec-head"><h2>Правила и заметки</h2></div>'+(notes.length?chips:'');
+  if(!list.length){
+    html+='<div class="empty glass"><div class="empty-ic">'+svg('note')+'</div><p class="empty-t">Здесь пока пусто</p>'+
+      '<p class="empty-s">Записывай правила для макетов, примечания типографии и задания руководителя.<br>Нажми «Новая заметка».</p></div>';
+  } else {
+    html+='<div class="list">'+list.map(noteCardHTML).join('')+'</div>';
+  }
+  sec.innerHTML=html;
+}
+function openNote(id){
+  var n=findN(id); if(!n) return;
+  var k=kindOf(n.kind), l=n.layoutId?findL(n.layoutId):null, task=n.kind==='task';
+  noteState={id:id};
+  openSheet(
+    (noteFrom && findL(noteFrom)?'<button class="s-back" data-act="note-back">'+svg('left',2.2)+'К макету</button>':'')+
+    head(n.title||k.hint)+
+    '<div class="chip-row"><span class="type-chip k-'+k.id+'"><i style="background:var(--ni)"></i>'+k.label+'</span>'+
+    (l?'<button class="type-chip" data-act="note-layout" data-id="'+esc(l.id)+'">'+svg('layers',2)+esc(l.title)+'</button>':'')+
+    (n.pinned?'<span class="type-chip">'+svg('pin',2)+'Закреплено</span>':'')+'</div>'+
+    (n.text?'<div class="note-full">'+esc(n.text)+'</div>':'<div style="height:14px"></div>')+
+    '<p class="note-when">'+(n.updated&&n.created&&n.updated-n.created>60000?'Изменено ':'Добавлено ')+noteWhen(n.updated)+'</p>'+
+    (task?'<button class="btn '+(n.done?'ghost':'primary')+' done-btn" data-act="note-done" data-id="'+esc(n.id)+'">'+(n.done?'Вернуть в работу':'Выполнено')+'</button>':'')+
+    '<div class="actions three">'+
+      '<button class="act" data-act="note-pin">'+svg('pin')+(n.pinned?'Открепить':'Закрепить')+'</button>'+
+      '<button class="act" data-act="note-edit">'+svg('edit')+'Изменить</button>'+
+      '<button class="act danger" data-act="note-del">'+svg('trash')+'Удалить</button>'+
+    '</div>'
+  );
+}
+function noteLayoutOptions(cur){
+  var groups=allTypes().map(function(t){
+    var ls=layouts.filter(function(l){ return typeOf(l.type).id===t.id; });
+    if(!ls.length) return '';
+    return '<optgroup label="'+esc(t.name)+'">'+ls.map(function(l){ return '<option value="'+esc(l.id)+'"'+(l.id===cur?' selected':'')+'>'+esc(l.title)+'</option>'; }).join('')+'</optgroup>';
+  }).join('');
+  return '<option value=""'+(cur?'':' selected')+'>Без привязки к макету</option>'+groups;
+}
+function openNoteEdit(id,preset){
+  var n=id?findN(id):null; preset=preset||{};
+  noteState={id:n?n.id:null, kind:n?n.kind:(preset.kind||(noteFilter!=='all'?noteFilter:'rule'))};
+  var layoutId=n?(n.layoutId||''):(preset.layoutId||'');
+  openSheet(
+    head(n?'Изменить заметку':'Новая заметка', n?'note-cancel':'close')+
+    '<div class="field"><span class="label">Что это</span><div class="tchips kind-chips">'+NOTE_KINDS.map(function(k){
+      return '<button class="tchip k-'+k.id+(noteState.kind===k.id?' on':'')+'" data-act="nkind" data-k="'+k.id+'"><i style="background:var(--ni)"></i>'+k.hint+'</button>';
+    }).join('')+'</div></div>'+
+    '<label class="field"><span class="label">Заголовок</span><input class="input" id="nTitle" maxlength="100" placeholder="Например: Отступы под обрез" value="'+esc(n?n.title:'')+'"></label>'+
+    '<label class="field"><span class="label">Текст</span><textarea class="input" id="nText" rows="6" maxlength="3000" placeholder="Подробности, требования, сроки…" style="min-height:150px">'+esc(n?n.text:'')+'</textarea></label>'+
+    '<label class="field"><span class="label">Для какого макета</span><select class="input" id="nLayout">'+noteLayoutOptions(layoutId)+'</select></label>'+
+    '<div class="btn-row"><button class="btn ghost" data-act="'+(n?'note-cancel':'close')+'">Отмена</button><button class="btn primary" data-act="note-save">Сохранить</button></div>'
+  );
+  if(!n) setTimeout(function(){ try{ $('nTitle').focus(); }catch(e){} },350);
+}
+function saveNote(){
+  if(!noteState) return;
+  var title=($('nTitle').value||'').trim(), text=($('nText').value||'').replace(/\s+$/,'');
+  if(!title && !text.trim()){ haptic.note('error'); toast('Напиши заголовок или текст',true); $('nTitle').focus(); return; }
+  var lid=$('nLayout').value||'', now=Date.now(), n=noteState.id?findN(noteState.id):null;
+  if(n){ n.title=title; n.text=text; n.kind=noteState.kind; n.layoutId=lid; n.updated=now; if(n.kind!=='task') n.done=false; }
+  else { n={id:uid('n'),kind:noteState.kind,title:title,text:text,layoutId:lid,done:false,pinned:false,created:now,updated:now}; notes.push(n); }
+  haptic.note('success'); render();
+  if(noteFrom && findL(noteFrom)){ openLayout(noteFrom); noteFrom=null; } else openNote(n.id);
+  toast('Сохранено');
+}
+function toggleNoteDone(id){
+  var n=findN(id); if(!n) return;
+  n.done=!n.done; n.updated=Date.now();
+  haptic.note(n.done?'success':'warning'); render();
+  if($('sheet').classList.contains('open') && noteState && noteState.id===id) openNote(id);
+  toast(n.done?'Задание выполнено':'Задание снова в работе');
+}
+function toggleNotePin(){
+  var n=noteState&&findN(noteState.id); if(!n) return;
+  n.pinned=!n.pinned; haptic.tap(); render(); openNote(n.id);
+  toast(n.pinned?'Закреплено наверху':'Откреплено');
+}
+function confirmNoteDel(){
+  var n=noteState&&findN(noteState.id); if(!n) return;
+  haptic.impact('medium');
+  openSheet(head('Удалить заметку?','note-cancel')+
+    '<p class="confirm-text">«'+esc(n.title||kindOf(n.kind).hint)+'» исчезнет навсегда. Восстановить её будет нельзя.</p>'+
+    '<div class="btn-row"><button class="btn ghost" data-act="note-cancel">Отмена</button><button class="btn danger" data-act="note-del-yes">Удалить</button></div>');
+}
+function doNoteDel(){
+  var n=noteState&&findN(noteState.id); if(!n) return;
+  notes=notes.filter(function(x){ return x.id!==n.id; });
+  noteState=null; haptic.note('warning'); render();
+  if(noteFrom && findL(noteFrom)){ openLayout(noteFrom); noteFrom=null; } else closeSheet();
+  toast('Заметка удалена');
+}
+function layoutNotesHTML(l){
+  var ls=sortedNotes(notes.filter(function(n){ return n.layoutId===l.id; }));
+  return '<div class="lnotes"><div class="lnotes-h"><span class="label">Правила и заметки</span>'+
+    '<button class="mini-btn" data-act="lnote-add" data-id="'+esc(l.id)+'">'+svg('plus',2.2)+'Добавить</button></div>'+
+    (ls.length ? ls.map(function(n){
+      var k=kindOf(n.kind);
+      return '<button class="lnote k-'+k.id+(n.kind==='task'&&n.done?' done':'')+'" data-act="lnote" data-id="'+esc(n.id)+'"><i></i><span>'+esc(n.title||n.text)+'</span></button>';
+    }).join('') : '<div class="lnotes-empty">Правил для этого макета пока нет.</div>')+'</div>';
+}
+function normNotes(arr){
+  return (Array.isArray(arr)?arr:[]).filter(function(n){ return n && (n.title||n.text); }).map(function(n,i){
+    var now=Date.now();
+    return {id:String(n.id||('n'+i+now)), kind:NOTE_KINDS.some(function(k){ return k.id===n.kind; })?n.kind:'rule',
+      title:String(n.title||''), text:String(n.text||''), layoutId:String(n.layoutId||''), done:!!n.done, pinned:!!n.pinned,
+      created:Number(n.created)||now, updated:Number(n.updated)||Number(n.created)||now};
+  });
 }
 
 /* ================= Нижние листы ================= */
@@ -888,7 +1103,7 @@ function closeSheet(){
   sh.classList.remove('open'); $('backdrop').classList.remove('open');
   document.body.style.overflow='';
   try{ tgv('6.1') && tg.BackButton.hide(); }catch(e){}
-  markState=null; calcState=null; invState=null; searchQ=null;
+  markState=null; calcState=null; invState=null; searchQ=null; noteState=null; noteFrom=null;
   var tok=++sheetToken;
   setTimeout(function(){ if(tok===sheetToken && !sh.classList.contains('open')) sh.innerHTML=''; },420);
 }
@@ -1020,6 +1235,7 @@ function openLayout(id){
     '<div class="chip-row"><span class="type-chip"><i style="background:'+t.color+'"></i>'+esc(t.name)+'</span>'+
     (st?'<span class="status-chip '+st+'">'+stepsHTML(l)+STAGE[st].status+'</span>':'<span class="status-chip none">Этапы не отмечены</span>')+'</div>'+
     '<div class="tl">'+rows+'</div>'+
+    layoutNotesHTML(l)+
     '<div class="actions">'+
       '<button class="act" data-act="edit">'+svg('edit')+'Изменить</button>'+
       '<button class="act danger" data-act="delete">'+svg('trash')+'Удалить</button>'+
@@ -1073,7 +1289,9 @@ function openConfirm(){
     '<div class="btn-row"><button class="btn ghost" data-act="back">Отмена</button><button class="btn danger" data-act="confirm-delete">Удалить</button></div>');
 }
 function doDelete(){
-  layouts=layouts.filter(function(x){ return x.id!==openId; });
+  var delId=openId;
+  layouts=layouts.filter(function(x){ return x.id!==delId; });
+  notes.forEach(function(n){ if(n.layoutId===delId) n.layoutId=''; });
   openId=null; closeSheet(); render(); haptic.note('warning'); toast('Макет удалён');
 }
 
@@ -1457,9 +1675,9 @@ function processPhoto(file){
 
 /* ================= Сохранение данных (личное: Telegram CloudStorage + память браузера) ================= */
 var dataReady=false, persistTimer=null, lastSavedJSON='', CS_CHUNK=3500, CS_PREFIX='md_';
-function snapshot(){ return {v:1, ts:Date.now(), types:types, layouts:layouts, invoices:invoices}; }
+function snapshot(){ return {v:1, ts:Date.now(), types:types, layouts:layouts, invoices:invoices, notes:notes}; }
 function validSaved(o){ return o && o.v===1 && Array.isArray(o.layouts) && Array.isArray(o.types) && o.invoices && typeof o.invoices==='object'; }
-function applySaved(o){ types=o.types; layouts=o.layouts; invoices=o.invoices; }
+function applySaved(o){ types=o.types; layouts=o.layouts; invoices=o.invoices; notes=normNotes(o.notes); }
 function cloudOK(){ return tgv('6.9') && tg && tg.CloudStorage; }
 function schedulePersist(){
   if(!dataReady) return;
@@ -1468,7 +1686,7 @@ function schedulePersist(){
 function persistNow(){
   if(!dataReady) return;
   clearTimeout(persistTimer);
-  var snap=snapshot(), body=JSON.stringify({types:snap.types,layouts:snap.layouts,invoices:snap.invoices});
+  var snap=snapshot(), body=JSON.stringify({types:snap.types,layouts:snap.layouts,invoices:snap.invoices,notes:snap.notes});
   if(body===lastSavedJSON) return;
   lastSavedJSON=body;
   var json=JSON.stringify(snap);
@@ -1512,13 +1730,13 @@ function startWithSaved(fallbackOk){
   var local=loadLocalSaved();
   if(local) applySaved(local);
   if(!local && !fallbackOk) return false;
-  lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices});
+  lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices,notes:notes});
   $('state').hidden=true; $('content').hidden=false; $('cta').hidden=false;
   render();
   loadCloudSaved(function(cloud){
     if(cloud && (!local || cloud.ts>local.ts)){
       applySaved(cloud); lsSet('appData',JSON.stringify(cloud));
-      lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices});
+      lastSavedJSON=JSON.stringify({types:types,layouts:layouts,invoices:invoices,notes:notes});
       dataReady=true; render();
     } else { dataReady=true; schedulePersist(); }
   });
@@ -1566,6 +1784,7 @@ function load(){
           if(/^\d{4}-\d{2}$/.test(k) && v && Number(v.amount)>0) invoices[k]={amount:Number(v.amount),note:String(v.note||'')};
         });
       }
+      notes=normNotes(data.notes);
       startWithSaved(true);
     })
     .catch(function(e){ clearTimeout(timer); console.error(e); if(!startWithSaved(false)) showState('error'); });
@@ -1617,13 +1836,27 @@ $('grid').addEventListener('touchend',function(e){
   tx=ty=null;
 },{passive:true});
 
-$('ctaBtn').addEventListener('click',function(){ haptic.impact('medium'); if(tab==='layouts') openMark(); else openCalc(); });
+$('ctaBtn').addEventListener('click',function(){ haptic.impact('medium'); if(tab==='layouts') openMark(); else if(tab==='rules') openNoteEdit(null,{}); else openCalc(); });
 
 function onAct(e){
   var a=e.target.closest('[data-act]'); if(!a) return;
   var d=a.dataset;
   switch(d.act){
     case 'close': closeSheet(); break;
+    case 'nfilter': haptic.tap(); noteFilter=d.f; renderNotes(); break;
+    case 'note': haptic.impact('light'); noteFrom=null; openNote(d.id); break;
+    case 'note-done': e.stopPropagation(); toggleNoteDone(d.id); break;
+    case 'note-edit': openNoteEdit(noteState&&noteState.id); break;
+    case 'note-cancel': if(noteState&&noteState.id) openNote(noteState.id); else closeSheet(); break;
+    case 'note-save': saveNote(); break;
+    case 'nkind': haptic.tap(); noteState.kind=d.k; a.parentNode.querySelectorAll('.tchip').forEach(function(c){ c.classList.toggle('on',c===a); }); break;
+    case 'note-pin': toggleNotePin(); break;
+    case 'note-del': confirmNoteDel(); break;
+    case 'note-del-yes': doNoteDel(); break;
+    case 'note-layout': haptic.impact('light'); noteFrom=null; openLayout(d.id); break;
+    case 'note-back': var fl=noteFrom; noteFrom=null; noteState=null; openLayout(fl); break;
+    case 'lnote': haptic.impact('light'); noteFrom=openId; openNote(d.id); break;
+    case 'lnote-add': haptic.impact('light'); noteFrom=d.id; openNoteEdit(null,{layoutId:d.id,kind:'rule'}); break;
     case 'close2': closeSheet2(); break;
     case 'back': openLayout(openId); break;
     case 'layout': haptic.impact('light'); openLayout(d.id); break;
@@ -1668,6 +1901,8 @@ function onAct(e){
 $('sheet').addEventListener('click',onAct);
 $('sheet2').addEventListener('click',onAct);
 $('dayList').addEventListener('click',onAct);
+$('notesSec').addEventListener('click',onAct);
+$('notesSec').addEventListener('keydown',function(e){ if((e.key==='Enter'||e.key===' ') && e.target.classList && e.target.classList.contains('note')){ e.preventDefault(); onAct(e); } });
 $('orderBtn').addEventListener('click',toggleReorder);
 $('dayList').addEventListener('pointerdown',function(e){
   var g=e.target.closest('[data-grip]'); if(!g) return;
