@@ -86,6 +86,28 @@ h1{margin:0;font-size:30px;line-height:1.05;font-weight:600;letter-spacing:-.025
 .icon-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--pink-deep);transition:transform .15s}
 .icon-btn:active{transform:scale(.9)}
 .icon-btn svg{width:20px;height:20px}
+.top-btns{display:flex;gap:8px}
+.s-field{position:relative;margin-bottom:12px}
+.s-field svg{position:absolute;left:15px;top:50%;width:19px;height:19px;margin-top:-9.5px;color:var(--pink);pointer-events:none}
+.s-field .input{padding-left:44px;padding-right:44px;-webkit-appearance:none;appearance:none}
+.s-field .input::-webkit-search-cancel-button{display:none}
+.s-clear{position:absolute;right:8px;top:50%;width:34px;height:34px;margin-top:-17px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.s-clear svg{position:static;margin:0;width:16px;height:16px;color:inherit}
+.s-count{margin:0 4px 8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pink-deep)}
+.s-list{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+.sres{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border-radius:18px;background:rgba(255,255,255,.8);border:1px solid var(--stroke);transition:transform .15s}
+.sres:active{transform:scale(.98)}
+.sres .tile{width:44px;height:44px;border-radius:14px}
+.sres .tile svg{width:20px;height:20px}
+.sres .tile.none{background:var(--idle);color:var(--muted)}
+.sres-b{flex:1;min-width:0}
+.sres-t{font-size:15px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.sres-t mark{background:rgba(var(--pk),.28);color:inherit;border-radius:4px;padding:0 1px}
+.sres-s{margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.sres-s i{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.s-empty{padding:26px 10px;text-align:center;font-size:14px;line-height:1.5;color:var(--muted)}
+.s-back{display:inline-flex;align-items:center;gap:4px;margin:-4px 0 10px;font-size:13px;font-weight:600;color:var(--pink-deep)}
+.s-back svg{width:16px;height:16px}
 .pill{flex-shrink:0;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
 
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:19px;margin:0 0 14px}
@@ -463,7 +485,10 @@ select.input{padding-right:44px;text-overflow:ellipsis;background-image:var(--ch
       <p class="sub" id="appSub">Этапы, количество и счета</p>
     </div>
     <div class="top-side">
-      <button class="icon-btn glass" id="bgBtn" aria-label="Выбрать фон"></button>
+      <div class="top-btns">
+        <button class="icon-btn glass" id="searchBtn" aria-label="Поиск макета"></button>
+        <button class="icon-btn glass" id="bgBtn" aria-label="Выбрать фон"></button>
+      </div>
       <div class="pill glass" id="headPill" hidden></div>
     </div>
   </header>
@@ -576,6 +601,7 @@ var ICON = {
   image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/>',
   tick:'<path d="M6 12.5l4 4 8-9"/>',
   up:'<path d="M6 15l6-6 6 6"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',
   down:'<path d="M6 9l6 6 6-6"/>',
   sort:'<path d="M8 4v16M4.5 7.5L8 4l3.5 3.5M16 20V4M12.5 16.5L16 20l3.5-3.5"/>',
   grip:'<circle cx="9" cy="6" r="1.2"/><circle cx="15" cy="6" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="18" r="1.2"/><circle cx="15" cy="18" r="1.2"/>',
@@ -862,7 +888,7 @@ function closeSheet(){
   sh.classList.remove('open'); $('backdrop').classList.remove('open');
   document.body.style.overflow='';
   try{ tgv('6.1') && tg.BackButton.hide(); }catch(e){}
-  markState=null; calcState=null; invState=null;
+  markState=null; calcState=null; invState=null; searchQ=null;
   var tok=++sheetToken;
   setTimeout(function(){ if(tok===sheetToken && !sh.classList.contains('open')) sh.innerHTML=''; },420);
 }
@@ -886,7 +912,7 @@ function closeSheet2(){
   var tok=++sheet2Token;
   setTimeout(function(){ if(tok===sheet2Token && !sh.classList.contains('open')) sh.innerHTML=''; },420);
 }
-function goBack(){ if($('sheet2').classList.contains('open')) closeSheet2(); else closeSheet(); }
+function goBack(){ if($('sheet2').classList.contains('open')) closeSheet2(); else if(searchQ!==null && !$('sInput')) openSearch(searchQ); else closeSheet(); }
 function head(title,act){
   return '<div class="sheet-head"><h3>'+esc(title)+'</h3><button class="close" data-act="'+(act||'close')+'" aria-label="Закрыть">'+svg('close',2)+'</button></div>';
 }
@@ -907,6 +933,61 @@ function refreshTypeUI(){
   var sel=$('cLayout'); if(sel && calcState){ sel.innerHTML=layoutOptions(sel.value); }
   var fx=document.querySelector('#sheet .fixed-l i'); if(fx && calcState){ var l=findL(calcState.layoutId); if(l) fx.style.background=typeOf(l.type).color; }
   render();
+}
+
+/* ---------- поиск ---------- */
+var searchQ=null;
+function normS(x){ return String(x||'').toLowerCase().replace(/ё/g,'е').replace(/[«»"“”„]/g,'').replace(/\s+/g,' ').trim(); }
+function hlS(title,q){
+  if(!q) return esc(title);
+  var t=String(title), n=t.toLowerCase().replace(/ё/g,'е'), out='', i=0, k;
+  var words=q.split(' ').filter(Boolean), marks=new Array(t.length).fill(false);
+  words.forEach(function(w){ var from=0; while((k=n.indexOf(w,from))>=0){ for(var j=k;j<k+w.length;j++) marks[j]=true; from=k+w.length; } });
+  while(i<t.length){ var on=marks[i], j2=i; while(j2<t.length && marks[j2]===on) j2++; out+=on?'<mark>'+esc(t.slice(i,j2))+'</mark>':esc(t.slice(i,j2)); i=j2; }
+  return out;
+}
+function lastDate(l){ return [l.request,l.sent,l.ready].concat(l.orders.map(function(o){ return o.date; })).filter(Boolean).sort().pop()||''; }
+function openSearch(q){
+  searchQ=q||'';
+  openSheet(head('Поиск макета')+
+    '<div class="s-field">'+svg('search',2)+'<input class="input" id="sInput" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Название или тип продукции" value="'+esc(searchQ)+'">'+
+    '<button class="s-clear" data-act="s-clear" aria-label="Очистить"'+(searchQ?'':' hidden')+'>'+svg('close',2.2)+'</button></div>'+
+    '<div id="sRes"></div>');
+  renderSearch();
+  setTimeout(function(){ var i=$('sInput'); if(i){ try{ i.focus(); i.setSelectionRange(i.value.length,i.value.length); }catch(e){} } },80);
+}
+function renderSearch(){
+  var box=$('sRes'); if(!box) return;
+  var q=normS(searchQ), words=q?q.split(' '):[];
+  var list=layouts.filter(function(l){
+    if(!words.length) return true;
+    var hay=normS(l.title+' '+typeOf(l.type).name);
+    return words.every(function(w){ return hay.indexOf(w)>=0; });
+  });
+  if(!words.length) list=list.slice().sort(function(a,b){ var da=lastDate(a), db=lastDate(b); return da<db?1:da>db?-1:0; });
+  var yr=String(new Date().getFullYear());
+  if(!list.length){
+    box.innerHTML='<div class="s-empty">'+(layouts.length?'Ничего не нашлось.<br>Попробуй часть названия, например одно слово.':'Макетов пока нет.')+'</div>';
+    return;
+  }
+  box.innerHTML='<p class="s-count">'+(words.length?'Найдено: '+list.length:'Все макеты · сначала свежие')+'</p><div class="s-list">'+list.map(function(l){
+    var st=statusOf(l), t=typeOf(l.type), sub=[];
+    if(st){ var d=l[st]; sub.push(STAGE[st].status+' · '+dateTiny(d)+(d.slice(0,4)!==yr?' '+d.slice(0,4):'')); }
+    else sub.push('Этапы не отмечены');
+    var q2=totalQty(l); if(q2) sub.push(fmtN(q2)+' шт.');
+    return '<button class="sres" data-act="s-open" data-id="'+esc(l.id)+'">'+
+      '<span class="tile '+(st||'none')+'">'+svg(st?STAGE[st].icon:'layers')+'</span>'+
+      '<span class="sres-b"><div class="sres-t">'+hlS(l.title,q)+'</div>'+
+      '<div class="sres-s"><i style="background:'+t.color+'"></i>'+hlS(t.name,q)+' · '+sub.join(' · ')+'</div></span>'+
+      '<span class="chev">'+svg('right',2)+'</span></button>';
+  }).join('')+'</div>';
+}
+function openFromSearch(id){
+  var l=findL(id); if(!l) return;
+  var inp=$('sInput'); if(inp) searchQ=inp.value;
+  var an=anchorStage(l), k=an?l[an]:(l.orders[0]&&l.orders[0].date);
+  if(k){ tab = an ? 'layouts' : 'orders'; focusDate(k); reorderDate=null; render(); }
+  haptic.impact('light'); openLayout(id);
 }
 
 /* ---------- карточка макета ---------- */
@@ -934,6 +1015,7 @@ function openLayout(id){
       }).join('')+'</div>'
       : '<div class="ord-empty">Пока ничего не посчитано.</div>')+'</div>';
   openSheet(
+    (searchQ!==null?'<button class="s-back" data-act="s-back">'+svg('left',2.2)+'К поиску</button>':'')+
     head(l.title)+ord+
     '<div class="chip-row"><span class="type-chip"><i style="background:'+t.color+'"></i>'+esc(t.name)+'</span>'+
     (st?'<span class="status-chip '+st+'">'+stepsHTML(l)+STAGE[st].status+'</span>':'<span class="status-chip none">Этапы не отмечены</span>')+'</div>'+
@@ -1491,6 +1573,8 @@ function load(){
 
 /* ================= События ================= */
 $('bgBtn').innerHTML=svg('palette');
+$('searchBtn').innerHTML=svg('search',2);
+$('searchBtn').addEventListener('click',function(){ haptic.impact('light'); openSearch(''); });
 $('bgBtn').addEventListener('click',function(){ haptic.impact('light'); openBgPicker(); });
 $('bgFile').addEventListener('change',function(){ processPhoto(this.files && this.files[0]); });
 $('prevBtn').innerHTML=svg('left',2);
@@ -1546,6 +1630,9 @@ function onAct(e){
     case 'order': haptic.impact('light'); openOrder(d.id,d.oid); break;
     case 'quick': quickMark(d.stage); break;
     case 'mv': moveCard(d.id,Number(d.dir)); break;
+    case 's-open': openFromSearch(d.id); break;
+    case 's-back': haptic.tap(); openSearch(searchQ||''); break;
+    case 's-clear': searchQ=''; var si=$('sInput'); if(si){ si.value=''; si.focus(); } a.hidden=true; renderSearch(); break;
     case 'tcolor': haptic.tap(); typesUI.colorFor = typesUI.colorFor===d.tid ? null : d.tid; typesUI.pending=null; renderTypes(); break;
     case 'tcol-set': setTypeColor(d.tid,d.color); break;
     case 'edit': openEdit(); break;
@@ -1625,6 +1712,11 @@ function endDrag(){
 $('dayList').addEventListener('pointerup',endDrag);
 $('dayList').addEventListener('pointercancel',endDrag);
 $('monthSec').addEventListener('click',onAct);
+$('sheet').addEventListener('input',function(e){
+  if(e.target.id!=='sInput') return;
+  searchQ=e.target.value; var c=document.querySelector('#sheet .s-clear'); if(c) c.hidden=!searchQ; renderSearch();
+});
+$('sheet').addEventListener('keydown',function(e){ if(e.target.id==='sInput' && e.key==='Enter'){ e.preventDefault(); e.target.blur(); } });
 $('sheet').addEventListener('change',function(e){
   if(e.target.id==='cLayout' && calcState){ calcState.layoutId=e.target.value; $('cNew').hidden=e.target.value!=='new'; if(e.target.value==='new') setTimeout(function(){ try{ $('cTitle').focus(); }catch(err){} },50); }
 });
