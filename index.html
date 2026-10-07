@@ -605,7 +605,7 @@ select.input{padding-right:44px;text-overflow:ellipsis;background-image:var(--ch
 'use strict';
 
 /* ================= Автообновление: если на сервере новая версия — перезагружаемся ================= */
-var APP_VERSION='2026-10-01.2';
+var APP_VERSION='2026-10-07.1';
 function checkForUpdate(){
   try{
     fetch(location.pathname+'?_check='+Date.now(),{cache:'no-store'})
@@ -728,7 +728,8 @@ function allTypes(){ return types.concat([OTHER]); }
 function typeOf(id){ return types.find(function(t){ return t.id===id; })||OTHER; }
 function findL(id){ return layouts.find(function(x){ return x.id===id; }); }
 function statusOf(l){ return l.ready?'ready':(l.sent?'sent':(l.request?'request':null)); }
-function anchorStage(l){ return l.request?'request':(l.sent?'sent':(l.ready?'ready':null)); }
+/* В календаре макет стоит в день отправки в печать; пока не отправлен — в день запроса */
+function anchorStage(l){ return l.sent?'sent':(l.request?'request':(l.ready?'ready':null)); }
 function stepsHTML(l){ var st=statusOf(l); return '<span class="steps"><i class="'+(st||'')+'"></i></span>'; }
 function totalQty(l){ return l.orders.reduce(function(a,o){ return a+o.qty; },0); }
 function monthKey(y,m){ return y+'-'+pad(m+1); }
@@ -866,7 +867,7 @@ function renderDay(){
       return;
     }
     if(!marks.length){
-      $('dayList').innerHTML='<div class="empty glass"><div class="empty-ic">'+svg('cal')+'</div><p class="empty-t">В этот день отметок нет</p><p class="empty-s">Макеты видны на дне своего запроса.<br>Нажми «Отметить», чтобы добавить новый.</p></div>';
+      $('dayList').innerHTML='<div class="empty glass"><div class="empty-ic">'+svg('cal')+'</div><p class="empty-t">В этот день отметок нет</p><p class="empty-s">Макет виден в день запроса, а после отправки<br>переезжает на день отправки в печать.<br>Нажми «Отметить», чтобы добавить новый.</p></div>';
       return;
     }
     $('dayList').innerHTML=marks.map(function(m){
@@ -1327,6 +1328,7 @@ function saveEdit(){
   if(err){ haptic.note('error'); toast(err,true); return; }
   l.title=title; l.type=typeSel.e||'other';
   l.request=draft.request; l.sent=draft.sent; l.ready=draft.ready;
+  var an=anchorStage(l); if(an) focusDate(l[an]);
   haptic.note('success'); render(); openLayout(l.id); toast('Изменения сохранены');
 }
 
